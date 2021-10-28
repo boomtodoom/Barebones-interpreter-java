@@ -86,15 +86,16 @@ public class JavaInterpreter {
      */
     void incr(){
         String line = codeLines.get(pointer);
-        String varName = line.substring(line.indexOf("incr")+5);
-        if(variables.contains(varName)==false){
-            variables.add(varName);
+        String[] elements = line.split("\s*\s");
+        String variable = elements[1];
+        if(variables.contains(variable)==false){
+            variables.add(variable);
             variableVal.add(1);
         } else {
-            int varIndex = variables.indexOf(varName);
+            int varIndex = variables.indexOf(variable);
             variableVal.set(varIndex,variableVal.get(varIndex)+1);
         }
-        System.out.println(varName + ": " + variableVal.get(variables.indexOf(varName)));
+        System.out.println(variable + ": " + variableVal.get(variables.indexOf(variable)));
     }
 
     /**
@@ -103,7 +104,8 @@ public class JavaInterpreter {
      */
     void decr(){
         String line = codeLines.get(pointer);
-        String varName = line.substring(line.indexOf("decr")+5);
+        String[] elements = line.split("\s*\s");
+        String varName = elements[1];
         if(variables.contains(varName)==false){
             variables.add(varName);
             variableVal.add(-1);
@@ -120,7 +122,8 @@ public class JavaInterpreter {
      */
     void clear(){
         String line = codeLines.get(pointer);
-        String varName = line.substring(line.indexOf("clear")+6);
+        String[] elements = line.split("\s*\s");
+        String varName = elements[1];
         if(variables.contains(varName)==false){
             variables.add(varName);
             variableVal.add(0);
@@ -138,10 +141,10 @@ public class JavaInterpreter {
      */
     void wLoop(){
         String line = codeLines.get(pointer);
-        String loopConditions = line.substring(line.indexOf("while")+6); //removes the first while from the string
-        if(loopConditions.contains("not 0 do")){ //checks the syntax of the language
-            int notIndex = loopConditions.indexOf("not");
-            String loopVar = loopConditions.substring(0,notIndex-1); //gets the variable name from the line
+        String[] element = line.split("\s*\s");
+        System.out.println(element[0]+element[1]+element[2]+element[3]+element[4]);
+        if(element[2].equals("not")&&element[3].equals("0")&&element[4].equals("do")){ //checks the syntax of the language
+            String loopVar = element[1];
             if(variables.contains(loopVar)){
                 int value = variableVal.get(variables.indexOf(loopVar));
                 if(value==0){
