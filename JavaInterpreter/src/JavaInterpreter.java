@@ -13,7 +13,6 @@ public class JavaInterpreter {
     private ArrayList<String> codeLines= new ArrayList<>(); //Creates an arraylist that contains every line within the code
     private Stack<Integer> stk = new Stack<>(); //creates a stack that contains the return addresses for the while loops
     private int pointer = 0; //Integer that contains the pointer to know which line the interpreter is currently running
-
     /**
      * The main method that starts by asking the user for the file location of their program and then
      * runs the readFile method to open the file and begins interpreting the program.
@@ -44,7 +43,12 @@ public class JavaInterpreter {
             }
             while(fileReader.hasNextLine()){
                 String line = fileReader.nextLine();
-                List<String> codeList = Arrays.asList(line.split(";")); //Splits the lines at the semi-colon
+                List<String> codeList= new ArrayList<>();
+                if(line.trim().isEmpty()==false) {
+                    codeList = Arrays.asList(line.split(";")); //Splits the lines at the semi-colon
+                } else {
+                    continue;
+                }
                 if(codeList.size()>0) {
                     codeLines.addAll(codeList);
                 } else {
@@ -61,12 +65,18 @@ public class JavaInterpreter {
                     interp.decr();
                 } else if (step.contains("while")){
                     interp.wLoop();
+                } else if (step.contains("func")){
+                    interp.func();
                 } else if (step.contains("end")){
-                    if(stk.isEmpty()==false){
-                        pointer=stk.pop();
+                    System.out.println("End" + stk.peek());
+                    if(stk.isEmpty()==false) {
+                        pointer = stk.pop();
                     }
+                } else if(step.contains("def")){
+                    interp.def();
                 } else {
                     System.err.println("Not a code statement");
+
                 }
                 pointer++;
             }
@@ -113,6 +123,7 @@ public class JavaInterpreter {
             int varIndex = variables.indexOf(varName);
             variableVal.set(varIndex,variableVal.get(varIndex)-1);
         }
+        System.out.println("Code line "+codeLines.get(pointer));
         System.out.println(varName + ": " + variableVal.get(variables.indexOf(varName)));
     }
 
@@ -186,5 +197,36 @@ public class JavaInterpreter {
             System.exit(1);
         }
 
+    }
+
+    void def(){
+        int endIndex=-1;
+        for(int i = pointer;i<codeLines.size();i++){
+            if(codeLines.get(i).contains("end")){
+                endIndex = i;
+                break;
+            }
+        }
+
+        if(endIndex!=-1){
+            pointer = endIndex;
+        } else {
+            System.err.println("There is no end index for your while loop starting at index " + pointer);
+        }
+    }
+
+    void func(){
+        System.out.println("func");
+        stk.push(pointer);
+        String line = codeLines.get(pointer);
+        String elements[] = line.split("\s*\s");
+        if(elements.length>1 && elements[0].equals("func")){
+            String funcName = elements[1];
+            for(int i=0; i< codeLines.size(); i++){
+                if(codeLines.get(i).contains("def")&&codeLines.get(i).contains(elements[1])){
+                    pointer = i;
+                }
+            }
+        }
     }
 }
